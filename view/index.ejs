@@ -1,0 +1,47 @@
+const express = require('express');
+
+module.exports = function(products) {
+  const router = express.Router();
+
+  // Halaman utama
+  router.get('/', (req, res) => {
+    res.render('index', {
+      title: 'Lumière Beauty',
+      products: products,
+      message: null
+    });
+  });
+
+  // Handle form kontak
+  router.post('/contact', (req, res) => {
+    const { nama, email, judul, pesan } = req.body;
+    const errors = [];
+
+    if (!nama || nama.trim() === '') errors.push('Nama lengkap wajib diisi.');
+    if (!email || email.trim() === '') errors.push('Email wajib diisi.');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Format email tidak valid.');
+    if (!judul || judul.trim() === '') errors.push('Judul pesan wajib diisi.');
+    if (!pesan || pesan.trim() === '') errors.push('Pesan wajib diisi.');
+
+    if (errors.length > 0) {
+      return res.render('index', {
+        title: 'Lumière Beauty',
+        products: products,
+        message: { type: 'error', texts: errors }
+      });
+    }
+
+    // Berhasil
+    console.log('📩 Pesan masuk dari:', nama, '|', email);
+    return res.render('index', {
+      title: 'Lumière Beauty',
+      products: products,
+      message: {
+        type: 'success',
+        texts: [`Terima kasih, ${nama}! Pesan Anda telah berhasil dikirim. Kami akan segera menghubungi Anda.`]
+      }
+    });
+  });
+
+  return router;
+};
